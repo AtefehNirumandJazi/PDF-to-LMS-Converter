@@ -37,7 +37,7 @@ PDF-to-LMS-Converter/
 ├── evaluation_results/          # Evaluation outputs
 │   ├── Canterbury_Question_Bank/
 │   └── QTI3_Examples/
-├── french_language/             # French language resources
+├── extensibility/             # French language resources
 ├── run_pipeline.py              # Main pipeline module
 ├── script.py                    # Example usage script
 ├── requirements.txt             # Python dependencies
