@@ -1,4 +1,4 @@
-# A Model-Driven QTI-Based Pipeline for PDF to Moodle Conversion
+# A Model-Driven QTI-Based Pipeline for PDF to LMS Conversion
 
 A Model-Driven QTI-Based pipeline that converts PDF-based assessments into QTI (Question & Test Interoperability) 3.0 format and then exports them as Moodle-compatible XML quizzes.
 
