@@ -12,7 +12,7 @@ This pipeline automates the conversion of PDF documents into structured assessme
 ## Project Structure
 
 ```
-QTI/
+PDF-to-LMS-Converter/
 ├── src/
 │   ├── __init__.py
 │   ├── __pycache__/
@@ -55,7 +55,7 @@ QTI/
 
 1. **Clone or navigate to the project:**
    ```bash
-   cd QTI
+   cd PDF-to-LMS-Converter
    ```
 
 2. **Create a virtual environment (recommended):**
