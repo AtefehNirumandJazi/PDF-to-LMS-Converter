@@ -20,6 +20,12 @@ def pdf_to_moodle(api_key: str, pdf_path: str, output_folder: str = None):
                                       If None, defaults to the project's output folder.
    """
 
+
+    if not output_folder:
+        output_folder = os.path.join(os.getcwd(), "output")
+
+    os.makedirs(output_folder, exist_ok=True)
+
     # Step 1: Generate QTI XML file code using the GPT API
     print("Step 1: Generating QTI XML code...")
     run_pipeline_qti_generation(api_key=api_key, pdf_path=pdf_path, output_folder=output_folder)
