@@ -1,4 +1,4 @@
-# A Model-Driven QTI-Based Pipeline for PDF to LMS Conversion
+# A Model-Driven QTI-Based Pipeline for PDF to Moodle Conversion
 
 A Model-Driven QTI-Based pipeline that converts PDF-based assessments into QTI (Question & Test Interoperability) 3.0 format and then exports them as Moodle-compatible XML quizzes.
 
@@ -117,14 +117,14 @@ This will:
 Represents a QTI-based metamodel with these domain classes:
 
 **Enumerations:**
-- `NavigationModeEnum` - Test navigation (LINEAR, NONLINEAR)
+- `NavigationModeEnum` - Assessment navigation (LINEAR, NONLINEAR)
 - `SubmissionModeEnum` - Response submission (INDIVIDUAL, SIMULTANEOUS)
 - `ShowHideEnum` - Conditional visibility (SHOW, HIDE)
 
 **Core Classes:**
-- `TestDefinition` - Root container for a complete assessment
-- `TestPart` - High-level test division with navigation/submission modes
-- `TestSection` - Mid-level content organizer with visibility control
+- `AssessmentDefinition` - Root container for a complete assessment
+- `AssessmentPart` - High-level Assessment division with navigation/submission modes
+- `AssessmentSection` - Mid-level content organizer with visibility control
 - `Question` - Assessment item with body, responses, outcomes, and feedback
 - `QuestionBody` - Question content with selectable blocks
 - `ResponseDeclaration` - Expected response structure and scoring
@@ -149,7 +149,7 @@ The codebase follows PEP 8 standards with strict pylint compliance.
 
 ### PDF Extraction Issues
 - Ensure PDFs are text-based (not scanned images)
-- Use `pdfplumber` to manually test extraction: `pdfplumber.open("file.pdf")`
+- Use `pdfplumber` to manually Assessment extraction: `pdfplumber.open("file.pdf")`
 
 ### QTI Generation Failures
 - Check API key validity and quota
