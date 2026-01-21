@@ -5,14 +5,14 @@ from typing import Optional
 from src.qti_to_lms.metamodel.qti import *
 
 
-def convert_qti_to_besser_model(root: ET.Element) -> "TestDefinition":
-    """Convert parsed XML root element to TestDefinition domain model.
+def convert_qti_to_besser_model(root: ET.Element) -> "AssessmentDefinition":
+    """Convert parsed XML root element to AssessmentDefinition domain model.
 
     Args:
         root: The root element of the parsed QTI XML.
 
     Returns:
-        A TestDefinition object representing the QTI assessment.
+        An AssessmentDefinition object representing the QTI assessment.
 
     Raises:
         NotImplementedError: This function is not yet implemented.
@@ -157,7 +157,7 @@ def build_feedbacks(feedbacks) -> set[ModalFeedback]:
 
         feedback = ModalFeedback(
             identifier=identifier,
-            is_hide=False if show_hide=="show" else True,
+            is_hidden=False if show_hide=="show" else True,
             paragraphs=paragraph_block_set,
             title="",
             data_extension=""
@@ -568,19 +568,19 @@ def build_questions(questions, base_path: str) -> set[Question]:
 
 
 
-def build_test_sections(test_sections, base_path: str) -> set[TestSection]:
-    """Build TestSection objects from QTI assessment section elements.
+def build_assessment_sections(assessment_sections, base_path: str) -> set[AssessmentSection]:
+    """Build AssessmentSection objects from QTI assessment section elements.
 
     Args:
-        test_sections: QTI assessment section elements.
+        assessment_sections: QTI assessment section elements.
         base_path: Base path for external file references.
 
     Returns:
-        Set of TestSection objects.
+        Set of AssessmentSection objects.
     """
-    test_section_set = set()
+    assessment_section_set = set()
 
-    for section in test_sections:
+    for section in assessment_sections:
         questions = set()  # reset for each section
 
         for child in section:
@@ -588,7 +588,7 @@ def build_test_sections(test_sections, base_path: str) -> set[TestSection]:
             if tag in {"qti-assessment-item-ref", "qti-assessment-item"}:
                 questions.add(child)
 
-        ts_obj = TestSection(
+        ts_obj = AssessmentSection(
             identifier=section.attrib.get("identifier", "UNDEFINED"),
             title=section.attrib.get("title", "UNDEFINED"),
             class_name="",
@@ -600,49 +600,48 @@ def build_test_sections(test_sections, base_path: str) -> set[TestSection]:
             keep_together="",
             data_extension="",
         )
-        test_section_set.add(ts_obj)
-    return test_section_set
+        assessment_section_set.add(ts_obj)
+    return assessment_section_set
 
 
 
-def build_test_parts(test_parts, base_path: str) -> set[TestPart]:
-    """Build TestPart domain objects from QTI test part elements.
+def build_assessment_parts(assessment_parts, base_path: str) -> set[AssessmentPart]:
+    """Build AssessmentPart domain objects from QTI assessment part elements.
 
     Args:
-        test_parts: Iterable of XML elements representing test parts.
+        assessment_parts: Iterable of XML elements representing assessment parts.
         base_path: Base directory path for resolving external file references.
 
     Returns:
-        A set of TestPart domain objects with sections and configuration.
+        A set of AssessmentPart domain objects with sections and configuration.
     """
-    test_parts_set = set()
-    test_sections = set()
+    assessment_parts_set = set()
+    assessment_sections = set()
 
-    for part in test_parts:
+    for part in assessment_parts:
         for child in part:
             tag = child.tag.split('}')[-1]
             if tag == "qti-assessment-section":
-                test_sections.add(child)
+                assessment_sections.add(child)
 
-        tp_obj = TestPart(
+        tp_obj = AssessmentPart(
             identifier=part.attrib.get("identifier", "UNDEFINED"),
             title=part.attrib.get("title", "UNDEFINED"),
             class_name="",
-            sections=build_test_sections(test_sections, base_path),
+            sections=build_assessment_sections(assessment_sections, base_path),
             navigation_mode=part.attrib.get("navigation-mode", "UNDEFINED"),
             submission_mode=part.attrib.get(
                 "submission-mode", "UNDEFINED"
             ),
             data_extension="",
         )
-        test_parts_set.add(tp_obj)
-    return test_parts_set
-
+        assessment_parts_set.add(tp_obj)
+    return assessment_parts_set
 
 def qti_to_besser(
     xml_path: str, encoding: str = "utf-8"
-) -> Optional["TestDefinition"]:
-    """Convert a QTI specification XML file to a Besser TestDefinition model.
+) -> Optional["AssessmentDefinition"]:
+    """Convert a QTI specification XML file to a Besser AssessmentDefinition model.
 
     Args:
         xml_path: Path to the QTI XML file to parse.
@@ -650,7 +649,7 @@ def qti_to_besser(
                  Falls back to 'utf-16' if the primary encoding fails.
 
     Returns:
-        A TestDefinition domain object if parsing succeeds, None otherwise.
+        An AssessmentDefinition domain object if parsing succeeds, None otherwise.
     """
 
     if not os.path.isfile(xml_path) or os.path.getsize(xml_path) == 0:
@@ -681,25 +680,25 @@ def qti_to_besser(
         print("❌ Failed to read or parse the XML file.")
         return None
 
-    test_parts = set()
+    assessment_parts = set()
 
     for child in root:
         # Strip the namespace if it exists
         tag = child.tag.split('}')[-1]  # e.g., '{namespace}qti-test-part' → 'qti-test-part'
 
         if tag == "qti-test-part":
-            test_parts.add(child)
+            assessment_parts.add(child)
 
     base_path = os.path.dirname(xml_path)
 
-    test_definition = TestDefinition(
+    assessment_definition = AssessmentDefinition(
         identifier=root.attrib.get("identifier", "UNDEFINED"),
         title=root.attrib.get("title", "UNDEFINED"),
         class_name="",
-        parts=build_test_parts(test_parts, base_path),
+        parts=build_assessment_parts(assessment_parts, base_path),
         tool_name="",
         tool_version="",
         data_extension="",
     )
 
-    return test_definition
+    return assessment_definition
