@@ -6,10 +6,10 @@
       <text>$course$/QTI Section A</text>
     </category>
   </question>
-{%- for test_part in test_def.parts %}
-  {%- for test_section in test_part.sections %}
+{%- for assessment_part in assessment_def.parts %}
+  {%- for assessment_section in assessment_part.sections %}
   {%- set ns = namespace(question_type='') %}
-    {%- for question in test_section.questions %}
+    {%- for question in assessment_section.questions %}
 
 {# --- Determine question type --- #}
 {%- if question.responses %}
