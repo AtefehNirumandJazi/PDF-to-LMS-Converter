@@ -8,7 +8,7 @@ class NavigationModeEnum(Enum):
     """Defines how candidates may navigate through an assessment in QTI 3.0.
 
     - Linear: The candidate must follow the predefined order of items without skipping.
-    - Nonlinear: The candidate may move freely between items, subject to test constraints.
+    - Nonlinear: The candidate may move freely between items, subject to assessment constraints.
     """
     Linear = "Linear"
     Nonlinear = "Nonlinear"
@@ -18,7 +18,7 @@ class SubmissionModeEnum(Enum):
     """Specifies when candidate responses are submitted during delivery in QTI 3.0.
 
     - Individual: Each item is submitted separately as the candidate progresses.
-    - Simultaneous: All items are submitted together at the end of the test or section.
+    - Simultaneous: All items are submitted together at the end of the assessment or section.
     """
     Individual = "Individual"
     Simultaneous = "Simultaneous"
@@ -300,12 +300,12 @@ class QuestionBody(Identifiable):
                 f"prompt={len(self.prompts)}, paragraphs={len(self.paragraphs)} "
                 f"min_choices={self.min_choices},)")
 
-# TestSection
-class TestSection(Identifiable):
+# AssessmentSection
+class AssessmentSection(Identifiable):
     """
-    Represents a mid-level container within a test part.
+    Represents a mid-level container within an assessment part.
 
-    A TestSection organizes assessment items or nested sections, supporting
+    An AssessmentSection organizes assessment items or nested sections, supporting
     visibility, ordering, and delivery control.
 
     Args:
@@ -319,7 +319,7 @@ class TestSection(Identifiable):
             keep_together (bool, optional): Whether section is delivered as a block.
                 Defaults to True.
             data_extension (str, optional): Optional metadata.
-            sub_sections (Set[TestSection], optional): Nested subsections.
+            sub_sections (Set[AssessmentSection], optional): Nested subsections.
     """
 
     def __init__(self, identifier: str, title: str,
@@ -329,7 +329,7 @@ class TestSection(Identifiable):
                  fixed: Optional[bool] = False,
                  keep_together: Optional[bool] = True,
                  data_extension: Optional[str] = None,
-                 sub_sections: Optional[Set[TestSection]] = None):
+                 sub_sections: Optional[Set[AssessmentSection]] = None):
 
         super().__init__(identifier)
         self.title: str = title
@@ -340,16 +340,16 @@ class TestSection(Identifiable):
         self.visible: bool = visible
         self.keep_together: bool = keep_together
         self.data_extension: str = data_extension
-        self.sub_sections: Set[TestSection] = sub_sections if sub_sections is not None else set()
+        self.sub_sections: Set[AssessmentSection] = sub_sections if sub_sections is not None else set()
 
     @property
     def title(self) -> str:
-        """str: Title of the test section."""
+        """str: Title of the assessment section."""
         return self.__title
 
     @title.setter
     def title(self, title: str):
-        """Set the title of the test section."""
+        """Set the title of the assessment section."""
         self.__title = title
 
     @property
@@ -374,7 +374,7 @@ class TestSection(Identifiable):
 
     @property
     def required(self) -> bool:
-        """bool: Indicates whether this section must be presented during test execution."""
+        """bool: Indicates whether this section must be presented during assessment execution."""
         return self.__required
 
     @required.setter
@@ -422,13 +422,13 @@ class TestSection(Identifiable):
         """Set optional metadata or extension information."""
         self.__data_extension = data_extension
 
-    def add_part(self, sub_section: TestSection):
+    def add_part(self, sub_section: AssessmentSection):
         """Adds a subsection to this section."""
         self.parts.add(sub_section)
 
 
     def __repr__(self):
-        return (f"TestSection({self.identifier}, "
+        return (f"AssessmentSection({self.identifier}, "
                 f"{self.title},  "
                 f"{self.class_name}, "
                 f"{self.required}, "
@@ -437,16 +437,16 @@ class TestSection(Identifiable):
                 f"{self.data_extension}, "
                 f"subsections={len(self.sub_sections)})")
 
-# TestPart
-class TestPart(Identifiable):
+# AssessmentPart
+class AssessmentPart(Identifiable):
     """
-    Represents a high-level division of a test in QTI.
+    Represents a high-level division of an assessment in QTI.
 
     Args:
-        identifier (str): Unique test part ID.
+        identifier (str): Unique assessment part ID.
         title (str): Descriptive title.
         class_name (str): Classification label.
-        sections (set[TestSection]): Sections included in this part.
+        sections (set[AssessmentSection]): Sections included in this part.
         navigation_mode (NavigationModeEnum): Learner navigation
             mode (e.g., linear, non-linear).
         submission_mode (SubmissionModeEnum): Response submission
@@ -455,7 +455,7 @@ class TestPart(Identifiable):
     """
 
     def __init__(self, identifier: str,
-                 sections: set[TestSection],
+                 sections: set[AssessmentSection],
                  navigation_mode: NavigationModeEnum,
                  submission_mode: SubmissionModeEnum,
                  title: Optional[str] = None,
@@ -466,18 +466,18 @@ class TestPart(Identifiable):
         self.title: str = title
         self.class_name: str = class_name
         self.data_extension: str = data_extension
-        self.sections: set[TestSection] = sections
+        self.sections: set[AssessmentSection] = sections
         self.navigation_mode: NavigationModeEnum = navigation_mode
         self.submission_mode: SubmissionModeEnum = submission_mode
 
     @property
     def title(self) -> Optional[str]:
-        """str: Title of the test part."""
+        """str: Title of the assessment part."""
         return self.__title
 
     @title.setter
     def title(self, title: Optional[str]):
-        """Set the title of the test part."""
+        """Set the title of the assessment part."""
         self.__title = title
 
     @property
@@ -501,17 +501,17 @@ class TestPart(Identifiable):
         self.__data_extension = data_extension
 
     @property
-    def sections(self) -> set[TestSection]:
-        """set[TestSection]: Returns the set of test sections in this part."""
+    def sections(self) -> set[AssessmentSection]:
+        """set[AssessmentSection]: Returns the set of assessment sections in this part."""
         return self.__sections
 
     @sections.setter
-    def sections(self, sections: set[TestSection]):
-        """set[TestSection]: Sets the sections, ensuring unique section names."""
+    def sections(self, sections: set[AssessmentSection]):
+        """set[AssessmentSection]: Sets the sections, ensuring unique section names."""
         if sections is not None:
             titles = [section.title for section in sections]
             if len(titles) != len(set(titles)):
-                raise ValueError("A test part cannot have two sections with the same name")
+                raise ValueError("An assessment part cannot have two sections with the same name")
         self.__sections = sections
 
     @property
@@ -535,7 +535,7 @@ class TestPart(Identifiable):
         self.__submission_mode = submission_mode
 
     def __repr__(self):
-        return (f"TestPart({self.identifier}, "
+        return (f"AssessmentPart({self.identifier}, "
                 f"{self.title}, "
                 f"{self.class_name}, "
                 f"{self.sections}, {self.navigation_mode}, "
@@ -579,7 +579,7 @@ class ModalFeedback(Identifiable):
         identifier (str): Unique ID for the feedback component.
         title (str): Title of the feedback modal.
         data_extension (str): Optional metadata or extension data.
-        is_hide (bool): Controls visibility of the modal (e.g., show/hide).
+        is_hidden (bool): Controls visibility of the modal (e.g., show/hide).
         paragraphs (set[ParagraphBlock], optional): Optional
                              instructional or feedback paragraphs.
     """
@@ -589,13 +589,13 @@ class ModalFeedback(Identifiable):
         identifier: str,
         title: Optional[str],
         data_extension: Optional[str] = None,
-        is_hide: bool = False,
+        is_hidden: bool = False,
         paragraphs: set[ParagraphBlock] = None
     ):
         super().__init__(identifier)
         self.title: str = title
         self.data_extension: str = data_extension
-        self.is_hide: bool = is_hide
+        self.is_hidden: bool = is_hidden
         self.paragraphs: set[ParagraphBlock]= paragraphs
 
     @property
@@ -619,14 +619,14 @@ class ModalFeedback(Identifiable):
         self.__data_extension = data_extension
 
     @property
-    def is_hide(self) -> bool:
+    def is_hidden(self) -> bool:
         """bool: Get the visibility mode for the modal feedback."""
-        return self.__is_hide
+        return self.__is_hidden
 
-    @is_hide.setter
-    def is_hide(self, is_hide: bool):
+    @is_hidden.setter
+    def is_hidden(self, is_hidden: bool):
         """Set the visibility mode for the modal feedback."""
-        self.__is_hide = is_hide
+        self.__is_hidden = is_hidden
 
     @property
     def paragraphs(self) -> set[ParagraphBlock]:
@@ -639,7 +639,7 @@ class ModalFeedback(Identifiable):
         self.__paragraphs = paragraphs
 
     def __repr__(self):
-        return f"ModalFeedback({self.is_hide}, " \
+        return f"ModalFeedback({self.is_hidden}, " \
                f"{self.title}, " \
                f"{self.data_extension}, {self.paragraphs})"
 
@@ -974,28 +974,28 @@ class Question(Identifiable):
             f"maxScore={self.max_score})"
         )
 
-#TestDefinition
-class TestDefinition(Identifiable):
+#AssessmentDefinition
+class AssessmentDefinition(Identifiable):
     """
-    Represents a complete QTI assessment test definition.
+    Represents a complete QTI assessment definition.
 
     Args:
-        identifier (str): Unique test ID.
-        title (str): Test title.
+        identifier (str): Unique assessment ID.
+        title (str): Assessment title.
         class_name (str): Classification label.
-        parts (set[TestPart]): Test parts included in this definition.
+        parts (set[AssessmentPart]): Assessment parts included in this definition.
         tool_name (str): Authoring tool name.
         tool_version (str): Authoring tool version.
         data_extension (str): Optional metadata extensions.
     """
 
-    def __init__(self, identifier: str, title: str, parts: set[TestPart],
+    def __init__(self, identifier: str, title: str, parts: set[AssessmentPart],
                  class_name: Optional[str] = None, tool_name: Optional[str] = None,
                  tool_version: Optional[str] = None, data_extension: Optional[str] = None):
         super().__init__(identifier)
         self.title: str = title
         self.class_name: str = class_name
-        self.parts: set[TestPart] = parts
+        self.parts: set[AssessmentPart] = parts
         self.tool_name: str = tool_name
         self.tool_version: str = tool_version
         self.data_extension: str = data_extension
@@ -1021,37 +1021,37 @@ class TestDefinition(Identifiable):
         self.__class_name = class_name
 
     @property
-    def parts(self) -> set[TestPart]:
-        """set[TestPart]: Returns the set of test parts within this test definition."""
+    def parts(self) -> set[AssessmentPart]:
+        """set[AssessmentPart]: Returns the set of assessment parts within this assessment definition."""
         return self.__parts
 
     @parts.setter
-    def parts(self, parts: set[TestPart]):
-        """set[TestPart]: Sets the test parts, ensuring part names are unique."""
+    def parts(self, parts: set[AssessmentPart]):
+        """set[AssessmentPart]: Sets the assessment parts, ensuring part names are unique."""
         if parts is not None:
             titles = [part.title for part in parts]
             if len(titles) != len(set(titles)):
-                raise ValueError("A test definition cannot have two parts with the same name")
+                raise ValueError("An assessment definition cannot have two parts with the same name")
         self.__parts = parts
 
     @property
     def tool_name(self) -> Optional[str]:
-        """str: Gets the name of the tool used to create the test."""
+        """str: Gets the name of the tool used to create the assessment."""
         return self.__tool_name
 
     @tool_name.setter
     def tool_name(self, tool_name: Optional[str]):
-        """str: Sets the name of the tool used to create the test."""
+        """str: Sets the name of the tool used to create the assessment."""
         self.__tool_name = tool_name
 
     @property
     def tool_version(self) -> Optional[str]:
-        """str: Gets the version of the tool used to create the test."""
+        """str: Gets the version of the tool used to create the assessment."""
         return self.__tool_version
 
     @tool_version.setter
     def tool_version(self, tool_version: Optional[str]):
-        """str: Sets the version of the tool used to create the test."""
+        """str: Sets the version of the tool used to create the assessment."""
         self.__tool_version = tool_version
 
     @property
@@ -1065,7 +1065,7 @@ class TestDefinition(Identifiable):
         self.__data_extension = data_extension
 
     def __repr__(self):
-        return (f"TestDefinition({self.identifier}, {self.title}, {self.class_name}, "
+        return (f"AssessmentDefinition({self.identifier}, {self.title}, {self.class_name}, "
                 f"{self.parts}, {self.tool_version}, {self.tool_name}, {self.data_extension})")
 
 
