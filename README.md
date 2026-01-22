@@ -34,6 +34,10 @@ PDF-to-LMS-Converter/
 │       └── templates/           # Jinja2 templates
 │           └── moodle_template.py.j2
 │
+├── evaluation_scripts/          # Evaluation scripts for correctness assessment
+│   ├── pdf_to_qti_eval.py       # Evaluates PDF-to-QTI conversion accuracy
+│   └── qti_to_moodle_eval.py    # Evaluates QTI-to-Moodle conversion accuracy
+│
 ├── evaluation_results/          # Evaluation outputs
 │   ├── Canterbury_Question_Bank/
 │   └── QTI3_Examples/
